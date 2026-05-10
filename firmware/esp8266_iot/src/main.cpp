@@ -53,7 +53,7 @@ void applyOutputs();
 // ═════════════════════════════════════════════════════════════════════════════
 void setup() {
     Serial.begin(115200);
-    Serial.println("\n\n=== ESP8266 IoT Ecosystem v" FW_VERSION " ===");
+    Serial.println(F("\n\n=== ESP8266 IoT Ecosystem v" FW_VERSION " ==="));
 
     // Initialize GPIO
     pinMode(PIN_RELAY, OUTPUT);
@@ -66,17 +66,17 @@ void setup() {
     configMgr.begin();
 
     if (configMgr.load(deviceCfg)) {
-        Serial.println("[BOOT] Valid config found, connecting to WiFi...");
+        Serial.println(F("[BOOT] Valid config found, connecting to WiFi..."));
 
         // Connect to WiFi using saved credentials
         WiFi.mode(WIFI_STA);
         WiFi.begin();
 
-        Serial.print("[WIFI] Connecting");
+        Serial.print(F("[WIFI] Connecting"));
         int attempts = 0;
         while (WiFi.status() != WL_CONNECTED && attempts < 40) {
             delay(500);
-            Serial.print(".");
+            Serial.print('.');
             attempts++;
             // Check for factory reset during boot
             if (digitalRead(PIN_BUTTON) == LOW) {
@@ -90,12 +90,12 @@ void setup() {
         Serial.println();
 
         if (WiFi.status() == WL_CONNECTED) {
-            Serial.printf("[WIFI] Connected! IP: %s\n", WiFi.localIP().toString().c_str());
+            Serial.printf_P(PSTR("[WIFI] Connected! IP: %s\n"), WiFi.localIP().toString().c_str());
 
             // Initialize NTP
             timeClient.begin();
             timeClient.update();
-            Serial.printf("[NTP] Time: %s\n", timeClient.getFormattedTime().c_str());
+            Serial.printf_P(PSTR("[NTP] Time: %s\n"), timeClient.getFormattedTime().c_str());
 
             // Initialize MQTT
             mqtt.onCommand(onMqttCommand);
@@ -107,11 +107,11 @@ void setup() {
             // Start web server
             webServer.begin(deviceCfg.deviceId, &relayState, &ledState);
         } else {
-            Serial.println("[WIFI] Connection failed, entering provisioning mode");
+            Serial.println(F("[WIFI] Connection failed, entering provisioning mode"));
             startProvisioning();
         }
     } else {
-        Serial.println("[BOOT] No valid config, entering provisioning mode");
+        Serial.println(F("[BOOT] No valid config, entering provisioning mode"));
         startProvisioning();
     }
 }
@@ -140,7 +140,7 @@ void handleButton() {
         // Button held down - check for long press
         if (!longPressHandled && (now - buttonDownTime >= LONG_PRESS_MS)) {
             longPressHandled = true;
-            Serial.println("[BTN] Long press detected - Factory Reset!");
+            Serial.println(F("[BTN] Long press detected - Factory Reset!"));
             factoryReset();
         }
     }
@@ -149,7 +149,7 @@ void handleButton() {
         // Button released
         if (!longPressHandled && (now - buttonDownTime >= DEBOUNCE_MS)) {
             // Short press - toggle relay and LED
-            Serial.println("[BTN] Short press - toggling outputs");
+            Serial.println(F("[BTN] Short press - toggling outputs"));
             toggleOutputs();
         }
         buttonPressed = false;
@@ -172,7 +172,7 @@ void applyOutputs() {
 
 // ─── Factory Reset ──────────────────────────────────────────────────────────
 void factoryReset() {
-    Serial.println("[RST] Factory reset initiated...");
+    Serial.println(F("[RST] Factory reset initiated..."));
 
     // Blink LED rapidly to indicate reset
     for (int i = 0; i < 10; i++) {
@@ -188,14 +188,14 @@ void factoryReset() {
     WiFi.disconnect(true);
     delay(500);
 
-    Serial.println("[RST] Config cleared, restarting...");
+    Serial.println(F("[RST] Config cleared, restarting..."));
     ESP.restart();
 }
 
 // ─── WiFiManager Provisioning (Captive Portal) ─────────────────────────────
 void startProvisioning() {
     WiFiManager wm;
-    wm.setDebugOutput(true);
+    wm.setDebugOutput(false);
 
     // Custom parameters for MQTT configuration
     paramHost     = new WiFiManagerParameter("mqtt_host", "HiveMQ Hostname", "", 128);
@@ -218,11 +218,11 @@ void startProvisioning() {
                            IPAddress(192, 168, 4, 1),
                            IPAddress(255, 255, 255, 0));
 
-    Serial.println("[PROV] Starting captive portal...");
+    Serial.println(F("[PROV] Starting captive portal..."));
     bool connected = wm.startConfigPortal(AP_NAME, AP_PASSWORD);
 
     if (connected) {
-        Serial.println("[PROV] WiFi connected via portal");
+        Serial.println(F("[PROV] WiFi connected via portal"));
 
         // Save MQTT config to LittleFS
         strlcpy(deviceCfg.mqttHost, paramHost->getValue(), sizeof(deviceCfg.mqttHost));
@@ -245,7 +245,7 @@ void startProvisioning() {
         // Start web server
         webServer.begin(deviceCfg.deviceId, &relayState, &ledState);
     } else {
-        Serial.println("[PROV] Portal timed out, restarting...");
+        Serial.println(F("[PROV] Portal timed out, restarting..."));
         ESP.restart();
     }
 
@@ -259,14 +259,14 @@ void startProvisioning() {
 
 // ─── MQTT Command Handler ───────────────────────────────────────────────────
 void onMqttCommand(const char* feature, bool state) {
-    Serial.printf("[CMD] Feature: %s, State: %s\n", feature, state ? "ON" : "OFF");
+    Serial.printf_P(PSTR("[CMD] Feature: %s, State: %s\n"), feature, state ? "ON" : "OFF");
 
     if (strcmp(feature, "relay") == 0) {
         relayState = state;
     } else if (strcmp(feature, "led") == 0) {
         ledState = state;
     } else {
-        Serial.printf("[CMD] Unknown feature: %s\n", feature);
+        Serial.printf_P(PSTR("[CMD] Unknown feature: %s\n"), feature);
         return;
     }
 
@@ -276,7 +276,7 @@ void onMqttCommand(const char* feature, bool state) {
 
 // ─── OTA Update Handler ────────────────────────────────────────────────────
 void onOtaRequest(const char* url) {
-    Serial.printf("[OTA] Starting update from: %s\n", url);
+    Serial.printf_P(PSTR("[OTA] Starting update from: %s\n"), url);
 
     // Blink LED to indicate OTA in progress
     digitalWrite(PIN_LED, HIGH);
@@ -286,16 +286,16 @@ void onOtaRequest(const char* url) {
 
     switch (result) {
         case HTTP_UPDATE_FAILED:
-            Serial.printf("[OTA] Update failed: %s\n",
+            Serial.printf_P(PSTR("[OTA] Update failed: %s\n"),
                           ESPhttpUpdate.getLastErrorString().c_str());
             digitalWrite(PIN_LED, LOW);
             break;
         case HTTP_UPDATE_NO_UPDATES:
-            Serial.println("[OTA] No updates available");
+            Serial.println(F("[OTA] No updates available"));
             digitalWrite(PIN_LED, LOW);
             break;
         case HTTP_UPDATE_OK:
-            Serial.println("[OTA] Update successful, restarting...");
+            Serial.println(F("[OTA] Update successful, restarting..."));
             // Device will restart automatically
             break;
     }
