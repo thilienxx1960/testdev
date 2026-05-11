@@ -23,10 +23,6 @@ void MqttManager::begin(const char* host, uint16_t port,
     snprintf(_topicOta,    sizeof(_topicOta),    TOPIC_OTA_TEMPLATE,    _deviceId);
     snprintf(_topicStatus, sizeof(_topicStatus), TOPIC_STATUS_TEMPLATE, _deviceId);
 
-    // TLS: reduce BearSSL buffers from 16384 default to save ~15KB heap
-    _wifiClient.setBufferSizes(512, 512);
-    _wifiClient.setInsecure();
-
     _mqttClient.setServer(_host, _port);
     _mqttClient.setBufferSize(256);
     _mqttClient.setCallback([this](char* t, byte* p, unsigned int l) {

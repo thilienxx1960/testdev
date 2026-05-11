@@ -1,6 +1,7 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // ESP8266 IoT Ecosystem Firmware
-// Controls LED (GPIO12) and Relay (GPIO15) via HiveMQ Cloud MQTT (TLS)
+// Controls LED (GPIO12) and Relay (GPIO15) via MQTT (no TLS)
+// Broker: OpenWrt Mosquitto at adangdang.ddns.net:443
 // Features: WiFiManager provisioning, LittleFS config, OTA, factory reset
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -198,8 +199,8 @@ void startProvisioning() {
     wm.setDebugOutput(false);
 
     // Custom parameters for MQTT configuration
-    paramHost     = new WiFiManagerParameter("mqtt_host", "HiveMQ Hostname", "", 128);
-    paramPort     = new WiFiManagerParameter("mqtt_port", "MQTT Port", "8883", 6);
+    paramHost     = new WiFiManagerParameter("mqtt_host", "MQTT Broker Host", "adangdang.ddns.net", 128);
+    paramPort     = new WiFiManagerParameter("mqtt_port", "MQTT Port", "443", 6);
     paramUser     = new WiFiManagerParameter("mqtt_user", "MQTT Username", "", 64);
     paramPass     = new WiFiManagerParameter("mqtt_pass", "MQTT Password", "", 64);
     paramDeviceId = new WiFiManagerParameter("device_id", "Device ID", "", 32);
