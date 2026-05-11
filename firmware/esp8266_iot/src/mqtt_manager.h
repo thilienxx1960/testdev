@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
-#include <WiFiClientSecure.h>
+
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
 #include "config.h"
@@ -32,21 +32,21 @@ private:
     void subscribe();
     void handleMessage(char* topic, byte* payload, unsigned int length);
 
-    WiFiClientSecure _wifiClient;
+    WiFiClient       _wifiClient;
     PubSubClient     _mqttClient;
     CommandCallback  _cmdCb;
     OtaCallback      _otaCb;
 
-    char _host[128];
+    const char* _host;
     uint16_t _port;
-    char _user[64];
-    char _pass[64];
-    char _deviceId[32];
+    const char* _user;
+    const char* _pass;
+    const char* _deviceId;
 
-    char _topicCmd[64];
-    char _topicState[64];
-    char _topicOta[64];
-    char _topicStatus[64];
+    char _topicCmd[48];
+    char _topicState[48];
+    char _topicOta[48];
+    char _topicStatus[48];
 
     unsigned long _lastReconnect;
     unsigned long _lastDiscovery;

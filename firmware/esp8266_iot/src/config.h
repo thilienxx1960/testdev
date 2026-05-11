@@ -11,7 +11,7 @@
 #define DEBOUNCE_MS          50   // Debounce time in ms
 
 // ─── MQTT Settings ──────────────────────────────────────────────────────────
-#define MQTT_PORT_DEFAULT    8883
+#define MQTT_PORT_DEFAULT    443
 #define MQTT_RECONNECT_MS    5000
 #define MQTT_QOS             1
 #define DISCOVERY_INTERVAL  30000  // Re-broadcast discovery every 30s

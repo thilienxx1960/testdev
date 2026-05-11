@@ -5,7 +5,7 @@ ConfigManager::ConfigManager() : _initialized(false) {}
 bool ConfigManager::begin() {
     _initialized = LittleFS.begin();
     if (!_initialized) {
-        Serial.println("[CFG] LittleFS mount failed, formatting...");
+        Serial.println(F("[CFG] LittleFS mount failed, formatting..."));
         LittleFS.format();
         _initialized = LittleFS.begin();
     }
@@ -17,7 +17,7 @@ bool ConfigManager::load(DeviceConfig& cfg) {
 
     File file = LittleFS.open(CONFIG_FILE, "r");
     if (!file) {
-        Serial.println("[CFG] Config file not found");
+        Serial.println(F("[CFG] Config file not found"));
         cfg.valid = false;
         return false;
     }
@@ -27,7 +27,7 @@ bool ConfigManager::load(DeviceConfig& cfg) {
     file.close();
 
     if (err) {
-        Serial.printf("[CFG] JSON parse error: %s\n", err.c_str());
+        Serial.printf_P(PSTR("[CFG] JSON parse error: %s\n"), err.c_str());
         cfg.valid = false;
         return false;
     }
@@ -39,7 +39,7 @@ bool ConfigManager::load(DeviceConfig& cfg) {
     strlcpy(cfg.deviceId, doc["device_id"] | "", sizeof(cfg.deviceId));
 
     cfg.valid = strlen(cfg.mqttHost) > 0 && strlen(cfg.deviceId) > 0;
-    Serial.printf("[CFG] Loaded config: host=%s, port=%d, id=%s, valid=%d\n",
+    Serial.printf_P(PSTR("[CFG] Loaded config: host=%s, port=%d, id=%s, valid=%d\n"),
                   cfg.mqttHost, cfg.mqttPort, cfg.deviceId, cfg.valid);
     return cfg.valid;
 }
@@ -56,13 +56,13 @@ bool ConfigManager::save(const DeviceConfig& cfg) {
 
     File file = LittleFS.open(CONFIG_FILE, "w");
     if (!file) {
-        Serial.println("[CFG] Failed to open config file for writing");
+        Serial.println(F("[CFG] Failed to open config file for writing"));
         return false;
     }
 
     serializeJson(doc, file);
     file.close();
-    Serial.println("[CFG] Config saved successfully");
+    Serial.println(F("[CFG] Config saved successfully"));
     return true;
 }
 
@@ -70,9 +70,9 @@ bool ConfigManager::clear() {
     if (!_initialized) return false;
 
     if (LittleFS.remove(CONFIG_FILE)) {
-        Serial.println("[CFG] Config cleared");
+        Serial.println(F("[CFG] Config cleared"));
         return true;
     }
-    Serial.println("[CFG] Failed to clear config");
+    Serial.println(F("[CFG] Failed to clear config"));
     return false;
 }

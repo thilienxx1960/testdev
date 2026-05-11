@@ -7,7 +7,7 @@ class MqttProvider extends ChangeNotifier {
   final MqttService _mqttService = MqttService();
 
   String _host = '';
-  int _port = 8883;
+  int _port = 443;
   String _username = '';
   String _password = '';
   String _clientId = 'flutter_iot_app';
@@ -35,7 +35,7 @@ class MqttProvider extends ChangeNotifier {
   Future<void> loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
     _host = prefs.getString('mqtt_host') ?? '';
-    _port = prefs.getInt('mqtt_port') ?? 8883;
+    _port = prefs.getInt('mqtt_port') ?? 443;
     _username = prefs.getString('mqtt_username') ?? '';
     _password = prefs.getString('mqtt_password') ?? '';
     _clientId = prefs.getString('mqtt_client_id') ?? 'flutter_iot_app';

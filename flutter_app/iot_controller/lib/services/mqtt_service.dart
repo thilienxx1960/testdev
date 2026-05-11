@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 
@@ -14,7 +13,7 @@ class MqttService {
 
   bool _isConnecting = false;
   String _host = '';
-  int _port = 8883;
+  int _port = 443;
   String _username = '';
   String _password = '';
   String _clientId = '';
@@ -47,10 +46,8 @@ class MqttService {
 
       _client = MqttServerClient.withPort(_host, _clientId, _port);
 
-      // TLS Configuration for HiveMQ Cloud
-      _client!.secure = true;
-      _client!.securityContext = SecurityContext.defaultContext;
-      _client!.onBadCertificate = (dynamic certificate) => true;
+      // Plain MQTT (no TLS) for OpenWrt Mosquitto broker
+      _client!.secure = false;
 
       // Connection settings
       _client!.keepAlivePeriod = 30;
@@ -67,8 +64,8 @@ class MqttService {
           .withClientIdentifier(_clientId)
           .authenticateAs(_username, _password)
           .startClean()
-          .withProtocolName('MQIsdp')
-          .withProtocolVersion(3);
+          .withProtocolName('MQTT')
+          .withProtocolVersion(4);
 
       _client!.connectionMessage = connMsg;
 

@@ -28,11 +28,11 @@ class IoTControllerApp extends StatelessWidget {
               DeviceProvider(ctx.read<MqttProvider>().service),
           update: (ctx, mqtt, prev) => prev ?? DeviceProvider(mqtt.service),
         ),
-        ChangeNotifierProxyProvider<DeviceProvider, AutomationProvider>(
+        ChangeNotifierProxyProvider<MqttProvider, AutomationProvider>(
           create: (ctx) =>
-              AutomationProvider(ctx.read<DeviceProvider>()),
-          update: (ctx, devices, prev) =>
-              prev ?? AutomationProvider(devices),
+              AutomationProvider(ctx.read<MqttProvider>().service),
+          update: (ctx, mqtt, prev) =>
+              prev ?? AutomationProvider(mqtt.service),
         ),
       ],
       child: MaterialApp(
@@ -100,6 +100,8 @@ class _MainNavigationState extends State<MainNavigation> {
       if (mqttProvider.isConnected && !_listeningStarted) {
         _listeningStarted = true;
         deviceProvider.startListening();
+        // Sync automation rules to server on connect
+        context.read<AutomationProvider>().syncToServer();
       } else if (!mqttProvider.isConnected) {
         _listeningStarted = false;
       }

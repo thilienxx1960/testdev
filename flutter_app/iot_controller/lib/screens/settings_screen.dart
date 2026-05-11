@@ -68,9 +68,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 _buildStatusCard(provider),
                 const SizedBox(height: 24),
 
-                // HiveMQ Settings
+                // MQTT Settings
                 const Text(
-                  'HiveMQ Cloud Configuration',
+                  'MQTT Broker Configuration',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -82,7 +82,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   controller: _hostController,
                   decoration: InputDecoration(
                     labelText: 'Hostname',
-                    hintText: 'xxxxxxxx.s1.eu.hivemq.cloud',
+                    hintText: 'adangdang.ddns.net',
                     prefixIcon: const Icon(Icons.dns),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -97,7 +97,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   controller: _portController,
                   decoration: InputDecoration(
                     labelText: 'Port',
-                    hintText: '8883',
+                    hintText: '443',
                     prefixIcon: const Icon(Icons.numbers),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -307,7 +307,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context.read<DeviceProvider>().startListening();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Connected to HiveMQ Cloud'),
+          content: Text('Connected to MQTT Broker'),
           backgroundColor: Colors.green,
         ),
       );
